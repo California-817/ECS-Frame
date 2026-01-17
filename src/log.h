@@ -1,4 +1,0 @@
-namespace Ecsfrm
-{
-    
-} // namespace Ecsfrm
