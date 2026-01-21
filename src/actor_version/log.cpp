@@ -6,6 +6,7 @@ namespace ecsfrm
     Logger::ptr LogSystemUtil::RegisterLogger(const std::string &name, bool is_replace)
     {
         std::lock_guard<std::mutex> lock(GetMutex());
+        LOCK_GUARD(lock,GetMutex());
         if (GetLoggerMap().find(name) == GetLoggerMap().end() || is_replace)
         {
             Logger::ptr logger = std::make_shared<Logger>(name);

@@ -1,3 +1,5 @@
+#ifndef __ECS_FRAME_LOG_H__
+#define __ECS_FRAME_LOG_H__
 #include <spdlog/spdlog.h>
 #include <iostream>
 #include <sstream>
@@ -5,6 +7,7 @@
 #include <unordered_set>
 #include <spdlog/fmt/bin_to_hex.h>
 #include <mutex>
+#include"macro.h"
 /*log macro*/
 #define LOG_REGISTER(name) \
     ecsfrm::LogSystemUtil::RegisterLogger(name)
@@ -42,34 +45,34 @@ namespace ecsfrm
         }
         void log(spdlog::level::level_enum lev, const std::string &msg)
         {
-            std::lock_guard<std::mutex> lock(_mtx);
+            LOCK_GUARD(lock, _mtx);
             return _logger->log(lev, msg);
         }
         template <typename Container>
         void log(spdlog::level::level_enum lev, const Container &cnta)
         {
-            std::lock_guard<std::mutex> lock(_mtx);
+            LOCK_GUARD(lock, _mtx);
             return _logger->log(lev, "{}", spdlog::to_hex(cnta));
         }
         void set_level(spdlog::level::level_enum lev)
         {
-            std::lock_guard<std::mutex> lock(_mtx);
+            LOCK_GUARD(lock, _mtx);
             return _logger->set_level(lev);
         }
         void set_pattern(const std::string &pattern)
         {
-            std::lock_guard<std::mutex> lock(_mtx);
+            LOCK_GUARD(lock, _mtx);
             return _logger->set_pattern(pattern);
         }
         void reset_logger(std::shared_ptr<spdlog::logger> logger)
         {
-            std::lock_guard<std::mutex> lock(_mtx);
+            LOCK_GUARD(lock, _mtx);
             _logger.reset();
             _logger = logger;
         }
         void set_sinks(std::vector<spdlog::sink_ptr> sinks)
         {
-            std::lock_guard<std::mutex> lock(_mtx);
+            LOCK_GUARD(lock, _mtx);
             _logger->sinks().swap(sinks);
         }
         const std::string &get_name() const
@@ -78,7 +81,7 @@ namespace ecsfrm
         }
         spdlog::level::level_enum get_level()
         {
-            std::lock_guard<std::mutex> lock(_mtx);
+            LOCK_GUARD(lock, _mtx);
             return _logger->level();
         }
 
@@ -120,11 +123,15 @@ namespace ecsfrm
         ~LogEvent()
         {
             logr->log(lev, ss.str());
+            if (logr->get_level() == spdlog::level::critical)
+                _exit(-1);
         }
         std::stringstream ss;
         std::shared_ptr<Logger> logr;
-        const char* file;
+        const char *file;
         int line;
         spdlog::level::level_enum lev;
     };
 } // namespace ecsfrm
+
+#endif
