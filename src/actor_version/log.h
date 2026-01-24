@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include <spdlog/fmt/bin_to_hex.h>
 #include <mutex>
-#include"macro.h"
+#include "macro.h"
 /*log macro*/
 #define LOG_REGISTER(name) \
     ecsfrm::LogSystemUtil::RegisterLogger(name)
@@ -45,34 +45,35 @@ namespace ecsfrm
         }
         void log(spdlog::level::level_enum lev, const std::string &msg)
         {
-            LOCK_GUARD(lock, _mtx);
+            std::lock_guard<std::mutex> lock(_mtx);
             return _logger->log(lev, msg);
         }
         template <typename Container>
         void log(spdlog::level::level_enum lev, const Container &cnta)
         {
-            LOCK_GUARD(lock, _mtx);
+            std::lock_guard<std::mutex> lock(_mtx);
             return _logger->log(lev, "{}", spdlog::to_hex(cnta));
         }
         void set_level(spdlog::level::level_enum lev)
         {
-            LOCK_GUARD(lock, _mtx);
+            std::lock_guard<std::mutex> lock(_mtx);
+
             return _logger->set_level(lev);
         }
         void set_pattern(const std::string &pattern)
         {
-            LOCK_GUARD(lock, _mtx);
+            std::lock_guard<std::mutex> lock(_mtx);
             return _logger->set_pattern(pattern);
         }
         void reset_logger(std::shared_ptr<spdlog::logger> logger)
         {
-            LOCK_GUARD(lock, _mtx);
+            std::lock_guard<std::mutex> lock(_mtx);
             _logger.reset();
             _logger = logger;
         }
         void set_sinks(std::vector<spdlog::sink_ptr> sinks)
         {
-            LOCK_GUARD(lock, _mtx);
+            std::lock_guard<std::mutex> lock(_mtx);
             _logger->sinks().swap(sinks);
         }
         const std::string &get_name() const
@@ -81,7 +82,7 @@ namespace ecsfrm
         }
         spdlog::level::level_enum get_level()
         {
-            LOCK_GUARD(lock, _mtx);
+            std::lock_guard<std::mutex> lock(_mtx);
             return _logger->level();
         }
 
