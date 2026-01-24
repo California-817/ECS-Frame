@@ -34,6 +34,7 @@ namespace ecsfrm
         epoll();
         if (_b_accpet_event)
             accept();
+        Network::Update();
     }
     void NetworkListen::accept()
     {

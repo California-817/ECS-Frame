@@ -18,7 +18,8 @@ namespace ecsfrm
 
         virtual void Dispose() override;
         virtual SOCKET GetSocket() const override;
-
+        /// @brief 每帧更新函数--->数据向ConnectObj发送
+        virtual void Update() override;
     protected:
         /// @brief 每次进行非阻塞epoll看哪些事件就绪并执行io操作
         /// @return

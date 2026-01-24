@@ -13,6 +13,16 @@ namespace ecsfrm
         virtual void Update() = 0;
         /// @brief 初始化函数
         virtual bool Init() = 0;
+        /// @brief 注册这个actor感兴趣的所有消息类型对应的msgid
+        virtual void RegisterMsgFunc() = 0;
+        /// @brief actor是否还活跃
+        /// @return bool
+        bool IsActive() const;
+        /// @brief 设置actor不再活跃
+        void SetNoActive();
+
+    private:
+        bool _is_active = true;
     };
 } // namespace ecsfrm
 

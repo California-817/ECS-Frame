@@ -10,10 +10,10 @@ namespace ecsfrm
     class ConnectObj : public IDisposable, public ISocketObj
     {
     public:
-        ConnectObj(Network* network,SOCKET sockfd);
+        ConnectObj(Network *network, SOCKET sockfd);
         ~ConnectObj();
         virtual void Dispose() override;
-        virtual SOCKET GetSocket() const override;
+        virtual SOCKET GetSocket() const override { return _sockfd; }
 
     private:
         // read buffer

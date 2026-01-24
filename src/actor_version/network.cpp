@@ -35,6 +35,10 @@ namespace ecsfrm
     Network::~Network() {}
 
     void Network::Dispose() {}
+    void Network::Update()
+    {
+        //todo
+    }
     SOCKET Network::GetSocket() const { return _master_socket; }
     void Network::init_socket(SOCKET socket)
     {
