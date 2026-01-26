@@ -8,8 +8,7 @@ namespace ecsfrm
         : _name(name)
     {
     }
-    /// @brief 线程启动函数
-    void Thread::start()
+    void Thread::Start()
     {
         if (_is_running)
         {
@@ -22,12 +21,22 @@ namespace ecsfrm
     void Thread::Dispose()
     {
         ASSERT_INFO(!_is_running);
+        // 1. 停止线程
         if (_thread)
         {
-            _thread->join();
+            if (_thread->joinable())
+                _thread->join();
             delete _thread;
             LOG_DEBUG(logger) << "Thread " << _name << " stop";
         }
+        // 2. 销毁所有还没有被及时处理的actor
+        for (auto &atr : _actors)
+        {
+            atr->SetNoActive();
+            atr->Dispose();
+            delete atr;
+        }
+        _actors.clear();
         _thread = nullptr;
     }
     Thread::~Thread()
@@ -67,9 +76,31 @@ namespace ecsfrm
     void Thread::PushActor(Actor *atr)
     {
         if (!_is_running || !atr)
+        {
+            LOG_ERROR(logger) << "Thread::PushActor() error: " << "thread is not running or actor is null";
+            if (atr)
+                delete atr;
             return;
+        }
         LOCK_GUARD(lock, _actors_mtx);
         _actors.push_back(atr);
+    }
+
+    void Thread::PushPacket(Packet *packet)
+    {
+        if (!_is_running || !packet)
+        {
+            LOG_ERROR(logger) << "Thread::PushPacket() error: " << "thread is not running or packet is null";
+            return;
+        }
+        LOCK_GUARD(lock, _actors_mtx);
+        for (auto &actor : _actors)
+        {
+            if (actor->IsFollowMsgId(packet->GetMsgId()))
+            {
+                actor->AddPacket(packet);
+            }
+        }
     }
 
 } // namespace ecsfrm

@@ -8,8 +8,6 @@ namespace ecsfrm
     class NetworkListen : public Network
     {
     public:
-        NetworkListen();
-        ~NetworkListen();
         /// @brief 初始化函数
         /// @return 是否成功
         virtual bool Init() override;
@@ -20,7 +18,8 @@ namespace ecsfrm
         bool Listen(const std::string &ip, int port);
         /// @brief 每帧调用的更新函数
         virtual void Update() override;
-
+        /// @brief 注册消息处理函数
+        virtual void RegisterMsgFunc() override;
     private:
         /// @brief 接受客户端连接
         void accept();

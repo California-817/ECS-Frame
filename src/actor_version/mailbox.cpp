@@ -22,16 +22,17 @@ namespace ecsfrm
         }
         for (auto &packet : copy_list)
         {
-            if (_id2func_map.find(1) == _id2func_map.end())
+            if (_id2func_map.find(packet->GetMsgId()) == _id2func_map.end())
             {
-                // LOG_WARN(g_logger)<<"handle packet failed, no register func msgid="<<packet->GetMsgId();
+                LOG_WARN(g_logger)<<"handle packet failed, no register func msgid="<<packet->GetMsgId();
                 continue;
             }
-            int ret = _id2func_map[1](packet); // 执行回调函数
+            int ret = _id2func_map[packet->GetMsgId()](packet); // 执行回调函数
             if (!ret)
             {
-                LOG_WARN(g_logger) << "handle func error which msgid=" << 1 << " ,ret=" << ret;
+                LOG_WARN(g_logger) << "handle func error which msgid=" << packet->GetMsgId() << " ,ret=" << ret;
             }
+            //packet好像在这里并不需要销毁 todo 当前会内存泄漏
         }
         copy_list.clear();
     }

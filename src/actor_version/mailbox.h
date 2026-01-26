@@ -4,9 +4,9 @@
 #include <mutex>
 #include<unordered_map>
 #include <functional>
+#include "packet.h"
 namespace ecsfrm
 {
-    class Packet;
     /// @brief 每个actor的邮箱类
     class MailBox
     {
