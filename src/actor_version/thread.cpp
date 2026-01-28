@@ -1,6 +1,7 @@
 #include "thread.h"
 #include "log.h"
 #include <chrono>
+#include <pthread.h>
 namespace ecsfrm
 {
     static Logger::ptr logger = LogSystemUtil::RegisterLogger("system");
@@ -39,6 +40,7 @@ namespace ecsfrm
     }
     void Thread::update()
     {
+        pthread_setname_np(pthread_self(), _name.c_str());
         while (_is_running)
         {
             {

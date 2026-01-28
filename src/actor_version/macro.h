@@ -9,6 +9,7 @@ namespace ecsfrm
     enum APP_TYPE
     {
         APP_LISTEN = 0,
+        APP_COMMON = 1,
     };
 
 #define LOCK_GUARD(name, mtx) \

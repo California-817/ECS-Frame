@@ -1,4 +1,5 @@
 #include "module.h"
+#include "util.h"
 #include <dlfcn.h>
 #include "log.h"
 namespace ecsfrm
@@ -14,9 +15,9 @@ namespace ecsfrm
         }
         void operator()(Module *ptr)
         {
-            //1.delete 模块本身
+            // 1.delete 模块本身
             delete ptr;
-            //2.关闭动态库
+            // 2.关闭动态库
             int ret = dlclose(_handle);
             if (ret)
             {
@@ -29,8 +30,8 @@ namespace ecsfrm
         void *_handle = nullptr;
     };
     /// @brief 运行时加载动态库并生成模块
-    /// @param lib_name 
-    /// @return 
+    /// @param lib_name
+    /// @return
     static Module::ptr Libary_Init(const char *lib_name)
     {
         do
@@ -69,8 +70,18 @@ namespace ecsfrm
     }
     bool ModuleMgr::Init(const std::string &path)
     {
-        // AddModule(path, Libary_Init(path.c_str()));
-        // todo
+        std::vector<std::string> libs = Util::GetFilesBySuffix(path, ".so");
+        if (!libs.empty() && libs[0] == std::string("Failed to open directory: ") + path)
+            return false;
+        for (auto &lib_name : libs)
+        {
+            Module::ptr module = Libary_Init(lib_name.c_str());
+            if (module)
+            {
+                AddModule(module->GetName(), module);
+            }
+        }
+        return true;
     }
     bool ModuleMgr::OnAppStart()
     {
@@ -79,6 +90,7 @@ namespace ecsfrm
         {
             i.second->OnAppStart();
         }
+        return true;
     }
     void ModuleMgr::DestroyModule(const std::string &module_name)
     {
@@ -99,9 +111,9 @@ namespace ecsfrm
         }
         _modules.clear();
     }
-    void ModuleMgr::AddModule(const std::string &lib_name, Module::ptr module)
+    void ModuleMgr::AddModule(const std::string &module_name, Module::ptr module)
     {
         LOCK_GUARD(lock, _mutex);
-        _modules[lib_name] = module;
+        _modules[module_name] = module;
     }
 } // namespace ecsfrm

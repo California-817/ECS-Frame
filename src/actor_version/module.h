@@ -45,10 +45,10 @@ namespace ecsfrm
         /// @brief 添加模块
         /// @param name 模块名称
         /// @param create_func 创建模块函数
-        void AddModule(const std::string &lib_name, Module::ptr module);
+        void AddModule(const std::string &module_name, Module::ptr module);
 
     private:
-        std::map<std::string, Module::ptr> _modules;
+        std::unordered_map<std::string, Module::ptr> _modules;
         std::mutex _mutex;
     };
 } // namespace ecsfrm

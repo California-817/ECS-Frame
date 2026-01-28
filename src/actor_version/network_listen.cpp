@@ -35,7 +35,6 @@ namespace ecsfrm
     void NetworkListen::Update()
     {
         // 每帧调用
-        LOG_DEBUG(logger) << "update";
         epoll();
         if (_b_accept_event)
             accept();
@@ -64,6 +63,7 @@ namespace ecsfrm
             else
             {
                 // new connection
+                LOG_DEBUG(logger) << "accept new connection, fd=" << newfd;
                 // 1. set socket opt
                 init_socket(newfd);
                 // 2. add to epoll

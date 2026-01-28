@@ -115,7 +115,7 @@ namespace ecsfrm
             LOG_CRITICAL(g_logger) << "epoll_create failed";
             return;
         }
-        add_event(_epfd, _master_socket, EPOLLIN | EPOLLOUT | EPOLLRDHUP);
+        add_event(_epfd, _master_socket, EPOLLIN | EPOLLOUT | EPOLLRDHUP | EPOLLET);
     }
     void Network::epoll()
     {
@@ -132,7 +132,7 @@ namespace ecsfrm
             }
             if (connect->HasSendData())
             {
-                // 有数据可发送
+                // 有数据可发送的时候再添加写事件---->防止写事件频繁触发
                 modify_event(_epfd, pair.first, EPOLLIN | EPOLLOUT | EPOLLRDHUP | EPOLLET);
                 continue;
             }
@@ -154,7 +154,7 @@ namespace ecsfrm
                 continue;
             }
             ConnectObj *connect = iter->second;
-            if (events & (EPOLLERR | EPOLLHUP | EPOLLRDHUP))
+            if (events & (EPOLLERR | EPOLLHUP))
             {
                 // error
                 LOG_WARN(g_logger) << "epoll error,fd=" << fd << " events=" << events;
@@ -164,6 +164,7 @@ namespace ecsfrm
             if (events & EPOLLIN)
             {
                 // 读事件就绪
+                LOG_DEBUG(g_logger) << "epoll read event ready,fd=" << fd;
                 if (connect->RecvData() < 0)
                 {
                     // 接收数据失败
