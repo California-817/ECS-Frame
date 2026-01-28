@@ -6,6 +6,10 @@
 namespace ecsfrm
 {
     static Logger::ptr logger = LogSystemUtil::RegisterLogger("system");
+    bool NetworkListen::Init()
+    {
+        return true;
+    }
     bool NetworkListen::Listen(const std::string &ip, int port)
     {
         _master_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -31,10 +35,15 @@ namespace ecsfrm
     void NetworkListen::Update()
     {
         // 每帧调用
+        LOG_DEBUG(logger) << "update";
         epoll();
-        if (_b_accpet_event)
+        if (_b_accept_event)
             accept();
         Network::Update();
+    }
+    void NetworkListen::RegisterMsgFunc()
+    {
+        Network::RegisterMsgFunc();
     }
     void NetworkListen::accept()
     {

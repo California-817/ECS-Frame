@@ -2,7 +2,7 @@
 #define __ESC_FRAME_MAILBOX_H__
 #include <list>
 #include <mutex>
-#include<unordered_map>
+#include <unordered_map>
 #include <functional>
 #include "packet.h"
 namespace ecsfrm
@@ -27,6 +27,13 @@ namespace ecsfrm
         bool IsFollowMsgId(int id) const { return _id2func_map.find(id) != _id2func_map.end(); }
         /// @brief 处理mailbox中所有消息--执行注册的回调函数
         void ProcessPacket();
+        /// @brief 派发packet到所有线程的所有actor中
+        /// @param packet
+        static void DispatchPacket(Packet *packet);
+        /// @brief 发送网络数据包
+        /// @param packet
+        static void SendNetPacket(Packet *packet);
+
     protected:
         std::list<Packet *> _mail_list;
         std::mutex _mail_mutex;

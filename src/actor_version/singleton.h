@@ -12,11 +12,11 @@ namespace ecsfrm
         /// @param ...args
         /// @return
         template <class... Args>
-        static T *CreateInstance(Args &&...args)
+        static void CreateInstance(Args &&...args)
         {
+            static T *s_instance = new T(std::forward<Args>(args)...);
             if (_instance == nullptr)
-                _instance = new T(std::forward<Args>(args)...);
-            return _instance;
+                _instance = s_instance;
         }
         /// @brief 获取单例实例
         /// @return

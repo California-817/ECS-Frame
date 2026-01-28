@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
+#include "protobuf/msg_id.pb.h"
 namespace ecsfrm
 {
     static Logger::ptr g_logger = LOG_REGISTER("system");
@@ -47,14 +48,27 @@ namespace ecsfrm
         }
     }
 
-    Network::Network() {}
-    Network::~Network() {}
-
-    void Network::Dispose() {}
+    void Network::Dispose()
+    {
+        if (_epfd != -1)
+            ::close(_epfd);
+        if (_master_socket != INVAILD_SOCKET)
+            ::shutdown(_master_socket, SHUT_RDWR);
+        for (auto &con : _connects_map)
+        {
+            con.second->Dispose();
+            delete con.second;
+        }
+        _connects_map.clear();
+        _master_socket = INVAILD_SOCKET;
+        {
+            LOCK_GUARD(lock, _netpackets_list_mutex);
+            _netpackets_list.clear();
+        }
+    }
     void Network::RegisterMsgFunc()
     {
-        //todo
-        MailBox::RegisterMsgFunc(0, BindFunP1(&Network::OnRecvCloseMsgFunc, this));
+        MailBox::RegisterMsgFunc(Proto::MsgId::MI_DisConnectToNet, BindFunP1(&Network::OnRecvCloseMsgFunc, this));
     }
     void Network::Update()
     {
@@ -105,6 +119,7 @@ namespace ecsfrm
     }
     void Network::epoll()
     {
+        _b_accept_event = false;
         for (auto &pair : _connects_map)
         {
             ConnectObj *connect = pair.second;
@@ -130,7 +145,7 @@ namespace ecsfrm
             if (fd == _master_socket)
             {
                 // new connection
-                _b_accpet_event = true;
+                _b_accept_event = true;
             }
             auto iter = _connects_map.find(fd);
             if (iter == _connects_map.end())

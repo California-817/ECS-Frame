@@ -22,7 +22,7 @@ namespace ecsfrm
         void SetNoActive();
 
     private:
-        bool _is_active = true;
+        std::atomic<bool> _is_active{true};
     };
 } // namespace ecsfrm
 

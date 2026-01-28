@@ -7,7 +7,7 @@ namespace ecsfrm
     class Packet : public IDisposable
     {
     public:
-        Packet(/* args */);
+        Packet(int msgid, SOCKET socket);
         ~Packet();
         virtual void Dispose() override;
         /// @brief 获取消息id
@@ -16,6 +16,8 @@ namespace ecsfrm
         SOCKET GetSocket() const;
 
     private:
+        const int _msgid;
+        const SOCKET _socket;
     };
 
 } // namespace ecsfrm

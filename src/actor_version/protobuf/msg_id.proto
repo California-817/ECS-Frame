@@ -1,0 +1,6 @@
+syntax= "proto3";
+package Proto;
+enum MsgId {
+  MI_None = 0;
+  MI_DisConnectToNet = 1;
+}

@@ -14,15 +14,14 @@ namespace ecsfrm
     class Network : public Actor, public ISocketObj
     {
     public:
-        Network();
-        virtual ~Network();
+        virtual ~Network()=default;
 
         virtual void Dispose() override;
         virtual SOCKET GetSocket() const override;
         virtual void RegisterMsgFunc() override;
         /// @brief 每帧更新函数--->将_netpackets_list中消息向ConnectObj发送
         virtual void Update() override;
-        /// @brief 发送网络数据包
+        /// @brief 发送网络数据包给指定的连接对象
         /// @param packet 
         void SendNetPacket(Packet *packet);
     protected:
@@ -40,9 +39,10 @@ namespace ecsfrm
     protected:
         int _epfd = -1;
         struct epoll_event _events[MAX_EVENTS];
-        bool _b_accpet_event = false;
+        bool _b_accept_event = false;
         SOCKET _master_socket = INVAILD_SOCKET;
         std::unordered_map<SOCKET, ConnectObj *> _connects_map;
+        /// @brief 网络数据包列表
         std::list<Packet*> _netpackets_list;
         std::mutex _netpackets_list_mutex;
     };

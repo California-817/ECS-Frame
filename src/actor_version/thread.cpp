@@ -30,13 +30,7 @@ namespace ecsfrm
             LOG_DEBUG(logger) << "Thread " << _name << " stop";
         }
         // 2. 销毁所有还没有被及时处理的actor
-        for (auto &atr : _actors)
-        {
-            atr->SetNoActive();
-            atr->Dispose();
-            delete atr;
-        }
-        _actors.clear();
+        ThreadActorList::Dispose();
         _thread = nullptr;
     }
     Thread::~Thread()
@@ -73,24 +67,24 @@ namespace ecsfrm
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
-    void Thread::PushActor(Actor *atr)
+    void ThreadActorList::PushActor(Actor *atr)
     {
-        if (!_is_running || !atr)
+        if (!atr)
         {
-            LOG_ERROR(logger) << "Thread::PushActor() error: " << "thread is not running or actor is null";
-            if (atr)
-                delete atr;
+            LOG_ERROR(logger) << "ThreadActorList::PushActor() error: " << "actor is null";
             return;
         }
         LOCK_GUARD(lock, _actors_mtx);
+        atr->Init();
+        atr->RegisterMsgFunc();
         _actors.push_back(atr);
     }
 
-    void Thread::PushPacket(Packet *packet)
+    void ThreadActorList::PushPacket(Packet *packet)
     {
-        if (!_is_running || !packet)
+        if (!packet)
         {
-            LOG_ERROR(logger) << "Thread::PushPacket() error: " << "thread is not running or packet is null";
+            LOG_ERROR(logger) << "ThreadActorList::PushPacket() error: " << "packet is null";
             return;
         }
         LOCK_GUARD(lock, _actors_mtx);
@@ -101,6 +95,17 @@ namespace ecsfrm
                 actor->AddPacket(packet);
             }
         }
+    }
+    void ThreadActorList::Dispose()
+    {
+        LOCK_GUARD(lock, _actors_mtx);
+        for (auto &atr : _actors)
+        {
+            atr->SetNoActive();
+            atr->Dispose();
+            delete atr;
+        }
+        _actors.clear();
     }
 
 } // namespace ecsfrm

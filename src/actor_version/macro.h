@@ -1,10 +1,16 @@
 #ifndef __ECS_FRAME_MACRO_H__
 #define __ECS_FRAME_MACRO_H__
 #include <mutex>
-#include<assert.h>
+#include <assert.h>
 #include "log.h"
 namespace ecsfrm
 {
+    /// @brief network app type
+    enum APP_TYPE
+    {
+        APP_LISTEN = 0,
+    };
+
 #define LOCK_GUARD(name, mtx) \
     std::lock_guard<std::mutex> name(mtx)
 
