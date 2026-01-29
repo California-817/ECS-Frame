@@ -116,4 +116,16 @@ namespace ecsfrm
         LOCK_GUARD(lock, _mutex);
         _modules[module_name] = module;
     }
+    std::string ModuleMgr::Info()
+    {
+        std::stringstream ss;
+        LOCK_GUARD(lock, _mutex);
+        ss << "\tModules:[";
+        for (auto &i : _modules)
+        {
+            ss << i.first << " ";
+        }
+        ss << "]";
+        return ss.str();
+    }
 } // namespace ecsfrm

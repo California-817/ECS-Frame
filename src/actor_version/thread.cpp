@@ -109,5 +109,16 @@ namespace ecsfrm
         }
         _actors.clear();
     }
-
+    std::string Thread::Info()
+    {
+        std::stringstream ss;
+        LOCK_GUARD(lock, _actors_mtx);
+        ss << "\tThread:" << _name << " [";
+        for (auto &atr : _actors)
+        {
+            ss << atr->GetTypeName() << " ";
+        }
+        ss << "]";
+        return ss.str();
+    }
 } // namespace ecsfrm

@@ -3,6 +3,7 @@
 #include "actor.h"
 #include <thread>
 #include "singleton.h"
+#include"util.h"
 namespace ecsfrm
 {
     class Cmd2Func : public Singleton<Cmd2Func>
@@ -17,7 +18,7 @@ namespace ecsfrm
         /// @brief 注册命令处理函数
         /// @param cmd
         /// @param func
-        void RegisterCmd(const std::string &cmd, CmdFunc func,const std::string& help);
+        void RegisterCmd(const std::string &cmd, CmdFunc func, const std::string &help);
 
     private:
         /// 一些基本框架命令的处理函数
@@ -33,8 +34,10 @@ namespace ecsfrm
         void CmdModule(const std::string &cmd);
         /// @brief 线程管理
         /// @param cmd
-        void CmdThead(const std::string &cmd);
-
+        void CmdThread(const std::string &cmd);
+        /// @brief 网络管理
+        /// @param cmd 
+        void CmdNet(const std::string &cmd);
     private:
         std::unordered_map<std::string, std::string> _cmd2help;
         std::unordered_map<std::string, CmdFunc> _cmd2func;
@@ -52,6 +55,10 @@ namespace ecsfrm
         virtual void RegisterMsgFunc() override;
         /// @brief 销毁线程
         virtual void Dispose() override;
+        virtual std::string GetTypeName() override
+        {
+            return Util::GetTypeString<Console>();
+        }
 
     private:
         void thread_func();
@@ -60,7 +67,7 @@ namespace ecsfrm
         std::thread *_thread = nullptr;
         std::mutex _mtx;
         std::list<std::string> _cmd_list;
-        std::atomic_bool _b_running {false};
+        std::atomic_bool _b_running{false};
     };
 } // namespace ecsfrm
 

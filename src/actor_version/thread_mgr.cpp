@@ -3,6 +3,21 @@
 namespace ecsfrm
 {
     static Logger::ptr g_logger = LogSystemUtil::RegisterLogger("system");
+    static const char *Type2String(APP_TYPE type)
+    {
+#define XX(x)         \
+    case APP_TYPE::x: \
+        return #x;    \
+        break;
+        switch (type)
+        {
+            XX(APP_LISTEN);
+            XX(APP_COMMON);
+        default:
+            break;
+        }
+#undef XX
+    }
     void ThreadMgr::NewThread()
     {
         LOCK_GUARD(lock, _th_mtx);
@@ -122,5 +137,34 @@ namespace ecsfrm
         LOCK_GUARD(lock, _net_mtx);
         auto iter = _networks.find(id);
         return iter != _networks.end() ? iter->second : nullptr;
+    }
+    std::string ThreadMgr::Info()
+    {
+        std::stringstream ss;
+        {
+            LOCK_GUARD(lock, _actors_mtx);
+            ss << "\tThread:master [";
+            for (auto &atr : _actors)
+            {
+                ss << atr->GetTypeName() << " ";
+            }
+        }
+        ss << "]" << std::endl;
+        LOCK_GUARD(lock, _th_mtx);
+        for (auto &th : _threads)
+        {
+            ss << th.second->Info() << std::endl;
+        }
+        return ss.str();
+    }
+    std::string ThreadMgr::NetInfo()
+    {
+        std::stringstream ss;
+        LOCK_GUARD(lock, _net_mtx);
+        for (auto &net : _networks)
+        {
+            ss << "\t" <<Type2String(net.first)<<" "<< net.second->Info() << std::endl;
+        }
+        return ss.str();
     }
 } // namespace ecsfrm

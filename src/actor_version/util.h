@@ -21,6 +21,14 @@ namespace ecsfrm
         /// @param suffix
         /// @return files
         static std::vector<std::string> GetFilesBySuffix(const std::string &path, const std::string &suffix);
+        /// @brief 获取类型字符串
+        /// @return
+        template <class T>
+        static const char *GetTypeString()
+        {
+            static const char *type_name = typeid(T).name();
+            return type_name;
+        }
     };
 } // namespace ecsfrm
 

@@ -41,6 +41,9 @@ namespace ecsfrm
         void DestroyModule(const std::string &module_name);
         /// @brief 卸载所有模块
         void DestroyAll();
+        /// @brief 获取模块信息
+        /// @return 
+        std::string Info();
     private:
         /// @brief 添加模块
         /// @param name 模块名称

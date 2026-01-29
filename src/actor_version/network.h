@@ -4,26 +4,34 @@
 #include "connect_obj.h"
 #include "Isocket_obj.h"
 #include "macro.h"
+#include "util.h"
 #include "actor.h"
 #include <sys/epoll.h>
 #include <unordered_map>
-#include<list>
+#include <list>
 namespace ecsfrm
 {
     /// @brief 网络类
     class Network : public Actor, public ISocketObj
     {
     public:
-        virtual ~Network()=default;
+        virtual ~Network() = default;
 
         virtual void Dispose() override;
         virtual SOCKET GetSocket() const override;
         virtual void RegisterMsgFunc() override;
         /// @brief 每帧更新函数--->将_netpackets_list中消息向ConnectObj发送
         virtual void Update() override;
+        virtual std::string GetTypeName() override
+        {
+            return Util::GetTypeString<Network>();
+        }
         /// @brief 发送网络数据包给指定的连接对象
-        /// @param packet 
+        /// @param packet
         void SendNetPacket(Packet *packet);
+        /// @brief 输出网络信息
+        /// @return 
+        std::string Info();
     protected:
         /// @brief 每次进行非阻塞epoll看哪些事件就绪并执行io操作
         /// @return
@@ -33,9 +41,10 @@ namespace ecsfrm
         /// @brief 初始化socket 设置reuseaddr和非阻塞，禁用negal算法
         void init_socket(SOCKET socket);
         /// @brief actor接收到关闭消息时的处理函数
-        /// @param packet 
-        /// @return 
-        int OnRecvCloseMsgFunc(Packet* packet);
+        /// @param packet
+        /// @return
+        int OnRecvCloseMsgFunc(Packet *packet);
+
     protected:
         int _epfd = -1;
         struct epoll_event _events[MAX_EVENTS];
@@ -43,7 +52,7 @@ namespace ecsfrm
         SOCKET _master_socket = INVAILD_SOCKET;
         std::unordered_map<SOCKET, ConnectObj *> _connects_map;
         /// @brief 网络数据包列表
-        std::list<Packet*> _netpackets_list;
+        std::list<Packet *> _netpackets_list;
         std::mutex _netpackets_list_mutex;
     };
 
@@ -59,10 +68,9 @@ namespace ecsfrm
     /// @param events
     void modify_event(int epfd, int fd, uint32_t events);
     /// @brief 删除epoll中事件
-    /// @param epfd 
-    /// @param fd 
+    /// @param epfd
+    /// @param fd
     void delete_event(int epfd, int fd);
-
 
 } // namespace ecsfrm
 

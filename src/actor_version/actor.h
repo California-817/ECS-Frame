@@ -20,6 +20,8 @@ namespace ecsfrm
         bool IsActive() const;
         /// @brief 设置actor不再活跃
         void SetNoActive();
+        /// @brief 获取actor的类型名
+        virtual std::string GetTypeName() = 0;
 
     private:
         std::atomic<bool> _is_active{true};

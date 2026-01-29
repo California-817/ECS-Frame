@@ -11,7 +11,7 @@
 #include "log.h"
 namespace ecsfrm
 {
-    static Logger::ptr g_logger = LogSystemUtil::RegisterLogger("app");
+    static Logger::ptr g_logger = LogSystemUtil::RegisterLogger("serverApp");
     /// @brief 每个app进程的启动主函数
     /// @tparam T app的具体类型
     /// @param argc
@@ -30,13 +30,19 @@ namespace ecsfrm
                 break;
             app->RunApp();
             app->Dispose();
+            delete app;
+            return 0;
+            // success return
         } while (false);
+        /// error return
         delete app;
         return -1;
     }
     /// @brief 捕获到退出信号时的处理函数
     /// @param
     void stop_handler(int signal);
+    /// @brief 服务器app类
+    /// @param
     class ServerApp : public IDisposable
     {
     public:
@@ -51,7 +57,7 @@ namespace ecsfrm
             sa.sa_flags = SA_RESTART;
             sigaction(SIGINT, &sa, NULL);
 
-            // init all instance
+            // create all instance
             ThreadMgr::CreateInstance();
             Global::CreateInstance(server_id);
             ModuleMgr::CreateInstance();
@@ -65,6 +71,11 @@ namespace ecsfrm
             ModuleMgr::GetInstance()->DestroyAll();
             if (_thread_mgr)
                 _thread_mgr->Dispose();
+            // destory all instance
+            ThreadMgr::DestoryInstance();
+            Global::DestoryInstance();
+            ModuleMgr::DestoryInstance();
+            Cmd2Func::DestoryInstance();
         }
         /// @brief 初始化app接口
         /// @return success
@@ -87,7 +98,7 @@ namespace ecsfrm
             return false;
         }
         /// @brief 启动app
-        bool StartApp()
+        virtual bool StartApp()
         {
             if (_is_running)
                 return true;
@@ -98,7 +109,7 @@ namespace ecsfrm
             // 2. 添加服务端必要的网络NetWork和控制台actor
             NetworkListen *network_listen = new NetworkListen();
             ret &= network_listen->Listen("0.0.0.0", 8080);
-            _thread_mgr->PushActorToChildThread(network_listen);
+            _thread_mgr->PushNetwork(APP_TYPE::APP_LISTEN,network_listen);
             _thread_mgr->PushActor(new Console());
             // 3. 调用模块的OnAppStart
             ret &= ModuleMgr::GetInstance()->OnAppStart();

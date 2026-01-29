@@ -37,7 +37,12 @@ namespace ecsfrm
         /// @brief 发送网络数据包到Network这个actor中的指定ConnectObj中
         /// @param packet
         void SendNetPacket(Packet *packet);
-
+        /// @brief 返回所有线程信息
+        /// @return 
+        std::string Info();
+        /// @brief 返回所有网络actor信息
+        /// @return 
+        std::string NetInfo();
     private:
         std::unordered_map<uint64_t,Thread *> _threads;
         std::vector<uint64_t> _thread_ids;

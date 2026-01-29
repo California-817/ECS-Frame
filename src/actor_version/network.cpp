@@ -86,6 +86,7 @@ namespace ecsfrm
                 continue;
             }
             iter->second->SendNetPacket(packet);
+            modify_event(_epfd, iter->first, EPOLLIN | EPOLLOUT | EPOLLRDHUP | EPOLLET);
         }
         tmpList.clear();
     }
@@ -196,5 +197,16 @@ namespace ecsfrm
         }
         iter->second->Close();
         return 0;
+    }
+    std::string Network::Info()
+    {
+        std::stringstream ss;
+        ss<<"\tNetwork: fd="<<_master_socket<<" [";
+        for(auto &iter : _connects_map)
+        {
+            ss<<iter.first<<" ";
+        }
+        ss<<"]";
+        return ss.str();
     }
 } // namespace ecsfrm

@@ -23,6 +23,12 @@ namespace ecsfrm
         {
             return (TimeStamp << 32) | (_server_id << 16) | _sn_id.fetch_add(1);
         }
+        /// @brief 返回服务器的server_id
+        /// @return
+        uint32_t GetServerId() const
+        {
+            return _server_id;
+        }
 
     private:
         const uint32_t _server_id;

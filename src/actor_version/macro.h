@@ -23,6 +23,7 @@ namespace ecsfrm
         assert(rule);                                                 \
     }
 
+#define VERSION "1.0.0"
 #define INVAILD_SOCKET -1
 #define SOCKET int
 #define MAX_EVENTS 4096

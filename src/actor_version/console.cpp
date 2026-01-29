@@ -1,6 +1,8 @@
 #include "console.h"
 #include <sstream>
 #include "log.h"
+#include "thread_mgr.h"
+#include "module.h"
 namespace ecsfrm
 {
     static Logger::ptr g_logger = LogSystemUtil::RegisterLogger("system");
@@ -11,7 +13,11 @@ namespace ecsfrm
     {
         // 初始化一些基本框架命令
         LOCK_GUARD(lock, _mtx);
-        REGISTER_CMD(--help, &Cmd2Func::CmdHelp, "show all commands");
+        REGISTER_CMD(help, &Cmd2Func::CmdHelp, "show all commands");
+        REGISTER_CMD(thread, &Cmd2Func::CmdThread, "show all thread info");
+        REGISTER_CMD(module, &Cmd2Func::CmdModule, "show all module info");
+        REGISTER_CMD(version, &Cmd2Func::CmdVersion, "show version info");
+        REGISTER_CMD(net, &Cmd2Func::CmdNet, "show network info");
     }
     void Cmd2Func::RegisterCmd(const std::string &cmd, CmdFunc func, const std::string &help)
     {
@@ -32,9 +38,10 @@ namespace ecsfrm
             func(cmd);
         else
         {
-            std::cout << "cmd is invalid:" << cmd << std::endl;
+            std::cout << "Cmd is invalid: " << cmd << std::endl;
             CmdHelp("--help");
         }
+        write(STDOUT_FILENO, "console>", 8);
     }
     void Console::Update()
     {
@@ -80,6 +87,7 @@ namespace ecsfrm
     {
         pthread_setname_np(pthread_self(), "thread_console");
         std::string cmd;
+        write(STDOUT_FILENO, "console>", 8);
         while (_b_running)
         {
             cmd.clear();
@@ -88,6 +96,10 @@ namespace ecsfrm
             {
                 LOCK_GUARD(lock, _mtx);
                 _cmd_list.push_back(cmd);
+            }
+            else
+            {
+                write(STDOUT_FILENO, "console>", 8);
             }
         }
         LOG_DEBUG(g_logger) << "thread console stop";
@@ -102,5 +114,21 @@ namespace ecsfrm
                << item.second << std::endl;
         }
         std::cout << ss.str();
+    }
+    void Cmd2Func::CmdVersion(const std::string &cmd)
+    {
+        std::cout << "\tVersion:" << VERSION << std::endl;
+    }
+    void Cmd2Func::CmdModule(const std::string &cmd)
+    {
+        std::cout << ModuleMgr::GetInstance()->Info() << std::endl;
+    }
+    void Cmd2Func::CmdThread(const std::string &cmd)
+    {
+        std::cout << ThreadMgr::GetInstance()->Info() << std::endl;
+    }
+    void Cmd2Func::CmdNet(const std::string &cmd)
+    {
+        std::cout << ThreadMgr::GetInstance()->NetInfo() << std::endl;
     }
 } // namespace ecsfrm

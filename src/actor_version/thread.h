@@ -43,7 +43,9 @@ namespace ecsfrm
         bool IsRunning() const { return _is_running; }
         /// @brief 暂停线程
         void Stop() { _is_running = false; }
-
+        /// @brief 返回线程信息
+        /// @return 
+        std::string Info();
     private:
         /// @brief 线程执行函数
         void update();
