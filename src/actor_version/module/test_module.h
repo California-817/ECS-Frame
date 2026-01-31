@@ -2,6 +2,7 @@
 #include "../actor.h"
 #include "../module.h"
 #include "../log.h"
+#include "../util.h"
 #include "../thread_mgr.h"
 static ecsfrm::Logger::ptr g_logger = ecsfrm::LogSystemUtil::RegisterLogger("test");
 class TestActor : public ecsfrm::Actor
@@ -22,6 +23,10 @@ public:
     }
     virtual void RegisterMsgFunc() override
     {
+    }
+    virtual std::string GetTypeName() override
+    {
+        return ecsfrm::Util::GetTypeString<TestActor>();
     }
 };
 

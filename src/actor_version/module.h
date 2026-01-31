@@ -44,6 +44,8 @@ namespace ecsfrm
         /// @brief 获取模块信息
         /// @return 
         std::string Info();
+        /// @brief 更新模块,如果有新的模块放到目录里面或者被移除，则也加载这个模块或者卸载这个模块---热更新
+        void Update();
     private:
         /// @brief 添加模块
         /// @param name 模块名称

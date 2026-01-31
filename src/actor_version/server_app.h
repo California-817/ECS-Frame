@@ -7,6 +7,7 @@
 #include "util.h"
 #include "network_listen.h"
 #include "module.h"
+#include "config.h"
 #include "console.h"
 #include "log.h"
 namespace ecsfrm
@@ -23,7 +24,10 @@ namespace ecsfrm
         T *app = nullptr;
         do
         {
-            app = new T(101);
+            ConfigMgr::CreateInstance("./conf");
+            if (!ConfigMgr::GetInstance()->Init())
+                break;
+            app = new T(ConfigUtil::GetConfigInt("server_id"));
             if (!app->InitApp())
                 break;
             if (!app->StartApp())
@@ -62,6 +66,8 @@ namespace ecsfrm
             Global::CreateInstance(server_id);
             ModuleMgr::CreateInstance();
             Cmd2Func::CreateInstance();
+
+            LogSystemUtil::ConfigLoggers();
 
             _thread_mgr = ThreadMgr::GetInstance();
         }
@@ -109,7 +115,7 @@ namespace ecsfrm
             // 2. 添加服务端必要的网络NetWork和控制台actor
             NetworkListen *network_listen = new NetworkListen();
             ret &= network_listen->Listen("0.0.0.0", 8080);
-            _thread_mgr->PushNetwork(APP_TYPE::APP_LISTEN,network_listen);
+            _thread_mgr->PushNetwork(APP_TYPE::APP_LISTEN, network_listen);
             _thread_mgr->PushActor(new Console());
             // 3. 调用模块的OnAppStart
             ret &= ModuleMgr::GetInstance()->OnAppStart();
@@ -119,7 +125,7 @@ namespace ecsfrm
         /// @brief 运行app
         void RunApp()
         {
-            LOG_INFO(g_logger) << "server begin run...";
+            LOG_INFO(g_logger) << "server id=" << _server_id<<" begin run...";
             ASSERT_INFO(_thread_mgr);
             while (_is_running)
             {
@@ -137,7 +143,7 @@ namespace ecsfrm
 
     private:
         ThreadMgr *_thread_mgr = nullptr;
-        uint64_t _server_id;
+        u_int32_t _server_id;
         APP_TYPE _app_type;
         static std::atomic_bool _is_running;
     };

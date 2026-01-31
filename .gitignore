@@ -1,5 +1,9 @@
 /build
-
+/bin/test
+/bin/modules/*
+/lib/*
+/src/actor_version/protobuf/*.pb.h
+/src/actor_version/protobuf/*.pb.cc
 
 # Prerequisites
 *.d

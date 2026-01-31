@@ -125,10 +125,10 @@ namespace ecsfrm
     }
     void Cmd2Func::CmdThread(const std::string &cmd)
     {
-        std::cout << ThreadMgr::GetInstance()->Info() << std::endl;
+        std::cout << ThreadMgr::GetInstance()->Info();
     }
     void Cmd2Func::CmdNet(const std::string &cmd)
     {
-        std::cout << ThreadMgr::GetInstance()->NetInfo() << std::endl;
+        std::cout << ThreadMgr::GetInstance()->NetInfo();
     }
 } // namespace ecsfrm
