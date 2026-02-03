@@ -1,6 +1,6 @@
 #include "module.h"
-#include "util.h"
 #include <dlfcn.h>
+#include "protobuf/msg_id.pb.h"
 #include "log.h"
 namespace ecsfrm
 {
@@ -68,7 +68,27 @@ namespace ecsfrm
         LOG_DEBUG(g_logger) << "Module::OnDistory " << _name;
         return true;
     }
-    bool ModuleMgr::Init(const std::string &path)
+
+    ModuleMgr::ModuleMgr(const std::string &path)
+        : _path(path)
+    {
+    }
+
+    bool ModuleMgr::Init()
+    {
+        return ModuleMgr::init(_path) &
+               ModuleMgr::OnAppStart();
+    }
+    void ModuleMgr::RegisterMsgFunc()
+    {
+        MailBox::RegisterMsgFunc(Proto::MI_ModuleLoad, BindFunP1(&ModuleMgr::msgLoadModule, this));
+        MailBox::RegisterMsgFunc(Proto::MI_ModuleDelete, BindFunP1(&ModuleMgr::msgdeleteModule, this));
+    }
+    void ModuleMgr::Dispose()
+    {
+        ModuleMgr::destroyAll();
+    }
+    bool ModuleMgr::init(const std::string &path)
     {
         std::vector<std::string> libs = Util::GetFilesBySuffix(path, ".so");
         if (!libs.empty() && libs[0] == std::string("Failed to open directory: ") + path)
@@ -78,10 +98,14 @@ namespace ecsfrm
             Module::ptr module = Libary_Init(lib_name.c_str());
             if (module)
             {
-                AddModule(module->GetName(), module);
+                addModule(module->GetName(), module);
             }
         }
         return true;
+    }
+    void ModuleMgr::Update()
+    {
+        //todo
     }
     bool ModuleMgr::OnAppStart()
     {
@@ -92,7 +116,7 @@ namespace ecsfrm
         }
         return true;
     }
-    void ModuleMgr::DestroyModule(const std::string &module_name)
+    void ModuleMgr::destroyModule(const std::string &module_name)
     {
         LOCK_GUARD(lock, _mutex);
         auto iter = _modules.find(module_name);
@@ -102,7 +126,7 @@ namespace ecsfrm
             _modules.erase(iter);
         }
     }
-    void ModuleMgr::DestroyAll()
+    void ModuleMgr::destroyAll()
     {
         LOCK_GUARD(lock, _mutex);
         for (auto &i : _modules)
@@ -111,7 +135,7 @@ namespace ecsfrm
         }
         _modules.clear();
     }
-    void ModuleMgr::AddModule(const std::string &module_name, Module::ptr module)
+    void ModuleMgr::addModule(const std::string &module_name, Module::ptr module)
     {
         LOCK_GUARD(lock, _mutex);
         _modules[module_name] = module;
@@ -128,4 +152,23 @@ namespace ecsfrm
         ss << "]";
         return ss.str();
     }
+
+    int ModuleMgr::msgLoadModule(Packet *packet)
+    {
+        std::string lib_name;
+        Module::ptr module = Libary_Init(lib_name.c_str());
+        if (module)
+        {
+            addModule(module->GetName(), module);
+            return 0;
+        }
+        return -1;
+    }
+    int ModuleMgr::msgdeleteModule(Packet *packet)
+    {
+        std::string module_name;
+        destroyModule(module_name);
+        return 0;
+    }
+
 } // namespace ecsfrm

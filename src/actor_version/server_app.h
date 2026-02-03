@@ -64,7 +64,6 @@ namespace ecsfrm
             // create all instance
             ThreadMgr::CreateInstance();
             Global::CreateInstance(server_id);
-            ModuleMgr::CreateInstance();
             Cmd2Func::CreateInstance();
 
             LogSystemUtil::ConfigLoggers();
@@ -74,13 +73,11 @@ namespace ecsfrm
         /// @brief 销毁接口
         virtual void Dispose() override
         {
-            ModuleMgr::GetInstance()->DestroyAll();
             if (_thread_mgr)
                 _thread_mgr->Dispose();
             // destory all instance
             ThreadMgr::DestoryInstance();
             Global::DestoryInstance();
-            ModuleMgr::DestoryInstance();
             Cmd2Func::DestoryInstance();
         }
         /// @brief 初始化app接口
@@ -91,11 +88,6 @@ namespace ecsfrm
             {
                 for (int i = 0; i < 3; ++i)
                     _thread_mgr->NewThread();
-                if (!ModuleMgr::GetInstance()->Init("./modules"))
-                {
-                    LOG_ERROR(g_logger) << "ModuleMgr::Init failed";
-                    break;
-                }
                 Cmd2Func::GetInstance()->Init();
                 Global::GetInstance()->YearDay = Util::GetYearDay();
                 Global::GetInstance()->TimeStamp = Util::GetTimeStamp();
@@ -112,20 +104,20 @@ namespace ecsfrm
             bool ret = true;
             // 1. 启动线程管理器
             _thread_mgr->Start();
-            // 2. 添加服务端必要的网络NetWork和控制台actor
+            // 2. 添加服务端必要的网络NetWork和控制台actor和模块actor
             NetworkListen *network_listen = new NetworkListen();
             ret &= network_listen->Listen("0.0.0.0", 8080);
             _thread_mgr->PushNetwork(APP_TYPE::APP_LISTEN, network_listen);
             _thread_mgr->PushActor(new Console());
-            // 3. 调用模块的OnAppStart
-            ret &= ModuleMgr::GetInstance()->OnAppStart();
+            ModuleMgr* mod=new ModuleMgr("./modules");
+            _thread_mgr->PushActor(mod);
             _is_running = true;
             return ret;
         }
         /// @brief 运行app
         void RunApp()
         {
-            LOG_INFO(g_logger) << "server id=" << _server_id<<" begin run...";
+            LOG_INFO(g_logger) << "server id=" << _server_id << " begin run...";
             ASSERT_INFO(_thread_mgr);
             while (_is_running)
             {
