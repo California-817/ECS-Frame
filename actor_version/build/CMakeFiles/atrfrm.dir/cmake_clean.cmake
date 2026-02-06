@@ -1,0 +1,41 @@
+file(REMOVE_RECURSE
+  "/home/xxxten/workspace/ECS-Frame/lib/libatrfrm.a"
+  "/home/xxxten/workspace/ECS-Frame/lib/libatrfrm.pdb"
+  "CMakeFiles/atrfrm.dir/core/actor.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/actor.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/buffer.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/buffer.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/config.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/config.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/connect_obj.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/connect_obj.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/console.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/console.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/log.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/log.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/mailbox.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/mailbox.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/module.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/module.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/network.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/network.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/network_buffer.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/network_buffer.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/network_listen.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/network_listen.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/packet.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/packet.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/protobuf/msg_id.pb.cc.o"
+  "CMakeFiles/atrfrm.dir/core/protobuf/msg_id.pb.cc.o.d"
+  "CMakeFiles/atrfrm.dir/core/thread.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/thread.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/thread_mgr.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/thread_mgr.cpp.o.d"
+  "CMakeFiles/atrfrm.dir/core/util.cpp.o"
+  "CMakeFiles/atrfrm.dir/core/util.cpp.o.d"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/atrfrm.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

@@ -1,0 +1,1 @@
+/usr/bin/c++  -rdynamic -Og -fPIC -ggdb -std=c++11 -Wall -Wno-deprecated  -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations CMakeFiles/test.dir/app/test/test.cpp.o -o /home/xxxten/workspace/ECS-Frame/bin/test/test  /home/xxxten/workspace/ECS-Frame/lib/libatrfrm.a -lspdlog -ldl -lyaml-cpp -lprotobuf 

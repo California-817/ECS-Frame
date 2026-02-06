@@ -1,9 +1,0 @@
-syntax= "proto3";
-package Proto;
-enum MsgId {
-  MI_None = 0; //无
-  MI_DisConnectToNet = 1; //逻辑层断线
-  
-  MI_ModuleLoad = 2; //模块加载
-  MI_ModuleDelete = 3; //模块删除
-}

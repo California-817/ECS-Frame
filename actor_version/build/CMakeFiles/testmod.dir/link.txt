@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC  -rdynamic -Og -fPIC -ggdb -std=c++11 -Wall -Wno-deprecated  -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations -shared -Wl,-soname,libtestmod.so -o /home/xxxten/workspace/ECS-Frame/bin/test/modules/libtestmod.so CMakeFiles/testmod.dir/app/test/module/test_module.cpp.o 
