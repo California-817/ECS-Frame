@@ -69,4 +69,5 @@ namespace ecsfrm
         closedir(dir);
         return files;
     }
+
 } // namespace ecsfrm

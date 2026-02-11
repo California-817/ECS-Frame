@@ -9,12 +9,17 @@ set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -rdynamic -Og -fPIC -ggdb -std=c++11 -Wall -
 set(CMAKE_C_FLAGS "$ENV{CXXFLAGS} -rdynamic -Og -fPIC -ggdb -std=c11 -Wall -Wno-deprecated  -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/core)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../third/lua)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../third)
 
 file(GLOB_RECURSE ACTOR_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/core/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/core/protobuf/*.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/lua_luncher/*.cpp
 )
 
+link_directories(/usr/local/lib)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../third/lua)
 add_library(atrfrm STATIC ${ACTOR_SOURCES})
 
 set_target_properties(atrfrm PROPERTIES
@@ -29,6 +34,7 @@ target_link_libraries(test atrfrm
                            dl
                            yaml-cpp
                            protobuf
+                           lua
 )
 add_library(testmod  SHARED ${CMAKE_CURRENT_SOURCE_DIR}/app/test/module/test_module.cpp)
 set_target_properties(testmod PROPERTIES

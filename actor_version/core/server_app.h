@@ -7,6 +7,7 @@
 #include "util.h"
 #include "network_listen.h"
 #include "module.h"
+#include "lua_service.h"
 #include "config.h"
 #include "console.h"
 #include "log.h"
@@ -26,7 +27,7 @@ namespace ecsfrm
         {
             // ConfigMgr::CreateInstance("./conf");
             // if (!ConfigMgr::GetInstance()->Init())
-                // break;
+            // break;
             // app = new T(ConfigUtil::GetConfigInt("server_id"));
             app = new T(1010);
             if (!app->InitApp())
@@ -110,8 +111,21 @@ namespace ecsfrm
             ret &= network_listen->Listen("0.0.0.0", 8080);
             _thread_mgr->PushNetwork(APP_TYPE::APP_LISTEN, network_listen);
             _thread_mgr->PushActor(new Console());
-            ModuleMgr* mod=new ModuleMgr("./modules");
+            ModuleMgr *mod = new ModuleMgr("./modules"); //todo
             _thread_mgr->PushActor(mod);
+            // 3.添加主lua服务
+            std::string script_path = "../../service"; //todo
+            std::vector<std::string> luas = Util::GetFilesBySuffix(script_path, ".lua");
+            if (!luas.empty() && luas[0] == std::string("Failed to open directory: ") + script_path)
+                ret &= false;
+            for (auto &lua : luas)
+            {
+                if (lua == script_path + "/main.lua")
+                {
+                    LuaService *main_lua_service = new LuaService(lua);
+                    _thread_mgr->PushActor(main_lua_service);
+                }
+            }
             _is_running = true;
             return ret;
         }
