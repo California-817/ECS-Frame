@@ -25,7 +25,7 @@ namespace ecsfrm
         /// @brief 获取actor的类型名
         virtual std::string GetTypeName() override
         {
-            return Util::GetTypeString<LuaService>();
+            return Util::GetTypeString<LuaService>()+_script;
         }
         virtual void Dispose() override;
 

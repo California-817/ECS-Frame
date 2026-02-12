@@ -1,7 +1,6 @@
 #include "lua_service.h"
 #include "log.h"
-#include"LuaBridge/LuaBridge.h"
-#include"lua_launcher/engine.h"
+#include "lua_launcher/lua_api.h"
 namespace ecsfrm
 {
     static Logger::ptr g_logger = LogSystemUtil::RegisterLogger("system");
@@ -11,28 +10,35 @@ namespace ecsfrm
     }
     bool LuaService::Init()
     {
-        _lua_state = luaL_newstate();
-        luaL_openlibs(_lua_state);
-        //导出cpp接口给lua使用
-        using namespace luabridge;
-            getGlobalNamespace(_lua_state)
-            .beginClass<EcsEngine>("EcsEngine")
-                .addConstructor<void(*)(int)>()
-                .addFunction("LogInfo",&EcsEngine::LogInfo)
-            .endClass();      
-          
-        if (luaL_dofile(_lua_state, _script.c_str()) != 0)
+        do
         {
-            LOG_ERROR(g_logger) << "Lua Service Init Failed , Script : " << _script<<" Error : "<< lua_tostring(_lua_state, -1);
-            return false;
-        }
-        /// 调用lua实现的Init函数
-        LOG_INFO(g_logger) << "Lua Service Init , _Script : " << _script;
-        return true;
+            _lua_state = luaL_newstate();
+            luaL_openlibs(_lua_state);
+
+            LuaAPI::RegisterLuaAPI(_lua_state);
+
+            if (luaL_dofile(_lua_state, _script.c_str()) != 0)
+                break;
+            /// 调用lua实现的Init函数
+            // 1.将lua的OnInit函数地址压入栈中
+            lua_getglobal(_lua_state, "Init");
+            // 2.参数入栈
+            // 3.调用
+            if (lua_pcall(_lua_state, 0, 1, 0) != 0)
+                break;
+            bool ret=lua_toboolean(_lua_state, -1);
+            lua_pop(_lua_state, 1);
+            LOG_INFO(g_logger) << "Lua Service Init , _Script : " << _script;
+            return ret;
+        } while (false);
+
+        LOG_ERROR(g_logger) << "Lua Service Init Failed , Script : " << _script << " Error : " << lua_tostring(_lua_state, -1);
+        lua_pop(_lua_state, 1);
+        return false;
     }
-    void LuaService::Update() 
+    void LuaService::Update()
     {
-        //调用lua的Update函数
+        // 调用lua的Update函数
     }
     void LuaService::RegisterMsgFunc()
     {
